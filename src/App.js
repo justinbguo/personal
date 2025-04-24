@@ -61,14 +61,15 @@ function Tooltip({ text, children }) {
       <span
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
+        onClick={() => setIsVisible(!isVisible)}
         className="cursor-help underline decoration-dotted decoration-emerald-500 underline-offset-4 hover:text-emerald-400 transition-colors"
       >
         {children}
       </span>
       {isVisible && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-xs">
-          <div className="bg-[#1a1a1a] border border-emerald-500/20 px-4 py-2 rounded-lg shadow-xl">
-            <div className="text-sm font-satoshi text-white/90">{text}</div>
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[280px] sm:max-w-xs z-30">
+          <div className="bg-[#1a1a1a] border border-emerald-500/20 px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-xl">
+            <div className="text-xs sm:text-sm font-satoshi text-white/90 whitespace-normal">{text}</div>
           </div>
         </div>
       )}
@@ -80,13 +81,13 @@ function SpotifyPopup({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-[#1a1a1a] p-6 rounded-lg shadow-xl max-w-md w-full">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-0">
+      <div className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-white font-instrument text-xl">Habe - Sweet</h3>
+          <h3 className="text-lg sm:text-xl text-white font-instrument">Habe - Sweet</h3>
           <button 
             onClick={onClose}
-            className="text-white/70 hover:text-white transition-colors"
+            className="text-white/70 hover:text-white transition-colors p-2 -mr-2"
           >
             ✕
           </button>
@@ -159,31 +160,31 @@ function App() {
         isOpen={isSpotifyOpen} 
         onClose={() => setIsSpotifyOpen(false)} 
       />
-      <main className="w-full max-w-2xl mx-auto px-6">
+      <main className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-0">
         {/* Header Section */}
-        <div className="mb-16">
-          <div className="flex items-center space-x-2 mb-3">
-            <h1 className="text-4xl text-white font-instrument tracking-tight underline decoration-emerald-500 underline-offset-4" style={{ textDecorationThickness: '3px' }}>
+        <div className="mb-8 sm:mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 mb-3">
+            <h1 className="text-3xl sm:text-4xl text-white font-instrument tracking-tight underline decoration-emerald-500 underline-offset-4" style={{ textDecorationThickness: '3px' }}>
               justin guo
             </h1>
-            <span className="text-white text-2xl">•</span>
-            <span className="text-4xl font-instrument p-2 bg-gradient-to-r from-emerald-300 via-emerald-500 via-green-600 to-teal-300 text-transparent bg-clip-text transition-transform duration-500 ease-in-out transform hover:scale-110">
+            <span className="hidden sm:inline text-white text-2xl">•</span>
+            <span className="text-3xl sm:text-4xl font-instrument p-2 bg-gradient-to-r from-emerald-300 via-emerald-500 via-green-600 to-teal-300 text-transparent bg-clip-text transition-transform duration-500 ease-in-out transform hover:scale-110">
               {phrases[phraseIndex]}
             </span>
           </div>
 
           {/* Bio Section */}
-          <div className="text-white leading-relaxed font-satoshi space-y-3 max-w-xl mb-2 ">
+          <div className="text-white leading-relaxed font-satoshi space-y-3 max-w-xl mb-2">
             <p className="text-md font-bold">
               i want to create magical experiences that make people smile. 
             </p>
-            <p className="text-md font-thin">
+            <p className="text-sm sm:text-md font-thin">
               however, i'm not a magician nor a dentist. 
             </p>
-            <p className="text-xl font-instrument italic underline underline-offset-4">
-            I ship products that solve problems. 
+            <p className="text-lg sm:text-xl font-instrument italic underline underline-offset-4">
+              I ship products that solve problems. 
             </p>
-            <p className="text-md font-thin">
+            <p className="text-sm sm:text-md font-thin">
               I'm currently a senior at the <a href="https://umich.edu" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">University of Michigan</a>, 
               where I'm exploring my interests in product management, startups, and finance.
             </p>
@@ -271,63 +272,68 @@ function App() {
           <div className="w-full h-px bg-white/20 my-4"></div>
 
           {/* Footer */}
-          <footer className="w-full ">
-            <div className="flex space-x-12">
+          <footer className="w-full">
+            <div className="grid grid-cols-3 sm:flex sm:space-x-12 gap-4 sm:gap-0 justify-center sm:justify-start">
               <a 
                 href="https://docs.google.com/document/d/1XQnzkvK-oNL-zi9_mMNQMw4kfCiQAgowdDgp_PBVMOQ/edit?usp=sharing" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
+                title="Interests"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 1c-4.4 0-8 3.6-8 8 0 2.6 1.2 4.9 3.1 6.3-.4 1.3-1 2.5-2 3.5-.2.2-.2.5-.1.7.1.2.3.3.5.3 2.2-.1 4-1 5.3-2.2.4.1.8.1 1.2.1 4.4 0 8-3.6 8-8s-3.6-8-8-8zm0 14.5c-.5 0-1-.1-1.5-.2-.2-.1-.4 0-.6.1-1 .9-2.2 1.5-3.5 1.8.7-1 1.2-2.1 1.5-3.3.1-.3 0-.6-.3-.8C6.1 12.3 5 10.7 5 9c0-3.9 3.1-7 7-7s7 3.1 7 7-3.1 7-7 7z"/>
                   <path d="M14.5 6.5c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5S16 8.8 16 8s-.7-1.5-1.5-1.5zm-5 0C8.7 6.5 8 7.2 8 8s.7 1.5 1.5 1.5S11 8.8 11 8s-.7-1.5-1.5-1.5zm5.5 4h-5c-.3 0-.5.2-.5.5s.2.5.5.5h5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5z"/>
                 </svg>
-                <span className="font-satoshi">Interests</span>
+                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Interests</span>
               </a>
               <a 
                 href="https://linkedin.com/in/justinbguo" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
+                title="LinkedIn"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"></path>
                 </svg>
-                <span className="font-satoshi">LinkedIn</span>
+                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">LinkedIn</span>
               </a>
               <a 
                 href="https://x.com/guo_dini" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
+                title="Twitter"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
                 </svg>
-                <span className="font-satoshi">Twitter</span>
+                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Twitter</span>
               </a>
               <a 
                 href="https://justinguo.substack.com/"
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
+                title="Writing"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
                 </svg>
-                <span className="font-satoshi">Writing</span>
+                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Writing</span>
               </a>
               <a 
                 href="https://docs.google.com/document/d/10l9hb2p25nOWMVBlgW55dBj3zzCRoMMdvr5U5-LTa5o/edit?tab=t.0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
+                title="Resume"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M14.25 2.5h-9a1.5 1.5 0 00-1.5 1.5v16a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V7.25L14.25 2.5zm0 1.5L18.75 8h-4.5V4zm-9 15.5V4h7.5v4.5a1.5 1.5 0 001.5 1.5h4.5v10h-13.5zm3-8.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zm0 3a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zm0 3a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75z"/>
                 </svg>
-                <span className="font-satoshi">Resume</span>
+                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Resume</span>
               </a>
             </div>
           </footer>
