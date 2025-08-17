@@ -185,8 +185,9 @@ function App() {
               I ship products that solve problems. 
             </p>
             <p className="text-sm sm:text-md font-thin">
-              I'm currently a senior at the <a href="https://umich.edu" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">University of Michigan</a>, 
-              where I'm exploring my interests in product management, startups, and finance.
+            I work on growing <a href="https://whatnot.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">Whatnot</a> (the fastest-growing marketplace in the US) pioneering the future of live-shopping in the US. 
+              Before that, I graduated from the <a href="https://umich.edu" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">University of Michigan</a>, 
+              where I explored my interests in product management, startups, and finance. 
             </p>
             <div 
               className="flex items-center group relative"
@@ -217,7 +218,7 @@ function App() {
                           
                           and completed{' '}
                           <span className="font-instrument italic font-bold">3 internships</span> at Fortune 200 companies and seed-stage startups.
-                          <span className="text-emerald-500 hover:text-emerald-400 bg-white/5 hover:bg-white/10 transition-all duration-300 text-md font-satoshi ml-2 inline-flex items-center justify-center h-7 w-7 spin-button rounded-full">
+                          <span className=" items-center justify-center text-emerald-500 hover:text-emerald-400 bg-white/5 hover:bg-white/10 transition-all duration-300 text-md font-satoshi ml-2 inline-flex items-center justify-center h-7 w-7 spin-button rounded-full">
                             ↻
                           </span>
                         </>
