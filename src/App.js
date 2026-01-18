@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
-import AnimatedText from './components/underline';
 
 function MoneyRain() {
   useEffect(() => {
@@ -93,6 +92,7 @@ function SpotifyPopup({ isOpen, onClose }) {
           </button>
         </div>
         <iframe
+          title="Spotify: Habe - Sweet"
           src="https://open.spotify.com/track/4sxWyjuwVqscK0YmfWrBvE?si=ee8707e3bff34072"
           width="100%"
           height="352"
@@ -111,7 +111,7 @@ function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showMoneyRain, setShowMoneyRain] = useState(false);
   const [isSpotifyOpen, setIsSpotifyOpen] = useState(false);
-  const phrases = ["think different", "expand luck", "ask why", "find humor", "create $hareholder value", "just kidding lol"];
+  const phrases = useMemo(() => ["think different", "expand luck", "ask why", "find humor", "create $hareholder value", "just kidding lol"], []);
 
   const experienceText = {
     default: "i built YC's classic tarpit social app, managed my favorite music artist, and completed internships at large companies and seed-stage startups",
