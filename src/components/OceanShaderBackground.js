@@ -24,8 +24,8 @@ const float SEA_HEIGHT = 0.6;
 const float SEA_CHOPPY = 4.0;
 const float SEA_SPEED = 0.8;
 const float SEA_FREQ = 0.16;
-const vec3 SEA_BASE = vec3(0.0, 0.09, 0.18);
-const vec3 SEA_WATER_COLOR = vec3(0.8, 0.9, 0.6) * 0.6;
+const vec3 SEA_BASE = vec3(0.0, 0.05, 0.11);
+const vec3 SEA_WATER_COLOR = vec3(0.45, 0.6, 0.5) * 0.35;
 #define SEA_TIME (1.0 + iTime * SEA_SPEED)
 #define EPSILON_NRM (0.1 / iResolution.x)
 const mat2 octave_m = mat2(1.6, 1.2, -1.2, 1.6);
