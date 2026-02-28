@@ -150,6 +150,16 @@ body,
   z-index: 9998;
 }
 
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-light,
+  .cursor-trail-svg,
+  .cursor-trail-line,
+  .cursor-trail-dot {
+    display: none !important;
+  }
+}
+
 @keyframes focusWordFade {
   0% {
     opacity: 0;

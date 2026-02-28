@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import OceanShaderBackground from './components/OceanShaderBackground';
 
 function App() {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [cursorTrail, setCursorTrail] = useState([]);
   const [focusIndex, setFocusIndex] = useState(0);
   const [isSteveHover, setIsSteveHover] = useState(false);
   const [hoverProfile, setHoverProfile] = useState('steve');
+  const [isHoverCapable, setIsHoverCapable] = useState(true);
   const [closeOnNextMove, setCloseOnNextMove] = useState(false);
   const isSteveHoverRef = useRef(false);
   const closeOnNextMoveRef = useRef(false);
@@ -23,37 +23,38 @@ function App() {
     { label: 'Twitter', href: 'https://x.com/guo_dini' },
     { label: 'Email', href: 'mailto:thejustinguo@gmail.com' },
   ];
+  const iconClassName = 'h-4 w-4 sm:h-5 sm:w-5';
 
   const renderLinkIcon = (label) => {
     switch (label) {
       case 'Second Brain':
         return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={iconClassName} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="6" y="3.75" width="13.5" height="16.5" rx="2.25" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 3.75v16.5M12 7.5h4.5M12 11.25h4.5M12 15h3.75M4.5 7.5h1.5M4.5 11.25h1.5M4.5 15h1.5" />
           </svg>
         );
       case 'Substack':
         return (
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={iconClassName} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z" />
           </svg>
         );
       case 'LinkedIn':
         return (
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={iconClassName} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" />
           </svg>
         );
       case 'Twitter':
         return (
-          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={iconClassName} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
         );
       case 'Email':
         return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className={iconClassName} fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 19.5H5.25A2.25 2.25 0 013 17.25V6.75z" />
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 7.5L12 13.5l8.5-6" />
           </svg>
@@ -72,9 +73,33 @@ function App() {
   }, [closeOnNextMove]);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateHoverCapability = (event) => {
+      setIsHoverCapable(event.matches);
+    };
+
+    setIsHoverCapable(mediaQuery.matches);
+    mediaQuery.addEventListener('change', updateHoverCapability);
+    return () => mediaQuery.removeEventListener('change', updateHoverCapability);
+  }, []);
+
+  useEffect(() => {
+    if (isHoverCapable) return undefined;
+
+    setIsSteveHover(false);
+    setCloseOnNextMove(false);
+    if (steveHoverTimeoutRef.current) {
+      window.clearTimeout(steveHoverTimeoutRef.current);
+      steveHoverTimeoutRef.current = null;
+    }
+    return undefined;
+  }, [isHoverCapable]);
+
+  useEffect(() => {
+    if (!isHoverCapable) return undefined;
+
     const handleMouseMove = (event) => {
       setCursorPos({ x: event.clientX, y: event.clientY });
-      setCursorTrail((prev) => [{ x: event.clientX, y: event.clientY }, ...prev].slice(0, 14));
 
       if (isSteveHoverRef.current && closeOnNextMoveRef.current) {
         setIsSteveHover(false);
@@ -86,7 +111,7 @@ function App() {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [isHoverCapable]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -106,7 +131,8 @@ function App() {
 
   useEffect(() => {
     const updateProgress = () => {
-      const maxTransitionDistance = window.innerHeight * 0.9;
+      const transitionFactor = isHoverCapable ? 0.9 : 1.4;
+      const maxTransitionDistance = window.innerHeight * transitionFactor;
       const progress = Math.min(window.scrollY / maxTransitionDistance, 1);
       setScrollProgress(progress);
     };
@@ -118,28 +144,10 @@ function App() {
       window.removeEventListener('scroll', updateProgress);
       window.removeEventListener('resize', updateProgress);
     };
-  }, []);
-
-  const trailPath = useMemo(() => {
-    if (cursorTrail.length < 2) return '';
-
-    const [first, ...rest] = cursorTrail;
-    let path = `M ${first.x} ${first.y}`;
-
-    for (let i = 1; i < cursorTrail.length; i++) {
-      const prev = cursorTrail[i - 1];
-      const curr = cursorTrail[i];
-      const midX = (prev.x + curr.x) / 2;
-      const midY = (prev.y + curr.y) / 2;
-      path += ` S ${prev.x} ${prev.y}, ${midX} ${midY}`;
-    }
-
-    const last = rest[rest.length - 1];
-    path += ` L ${last.x} ${last.y}`;
-    return path;
-  }, [cursorTrail]);
+  }, [isHoverCapable]);
 
   const handleProfileHoverTrigger = (profile) => {
+    if (!isHoverCapable) return;
     if (isSteveHoverRef.current || steveHoverTimeoutRef.current) return;
     steveHoverTimeoutRef.current = window.setTimeout(() => {
       steveHoverTimeoutRef.current = null;
@@ -176,12 +184,16 @@ function App() {
       <div className="fixed inset-0 pointer-events-none z-[1]" style={{ opacity: scrollProgress }}>
         <OceanShaderBackground />
       </div>
-      <div
-        className="cursor-light"
-        style={{ left: cursorPos.x, top: cursorPos.y }}
-        aria-hidden="true"
-      />
-      <div className="cursor-dot" style={{ left: cursorPos.x, top: cursorPos.y }} />
+      {isHoverCapable && (
+        <>
+          <div
+            className="cursor-light"
+            style={{ left: cursorPos.x, top: cursorPos.y }}
+            aria-hidden="true"
+          />
+          <div className="cursor-dot" style={{ left: cursorPos.x, top: cursorPos.y }} />
+        </>
+      )}
       <div>
         <div className="fixed inset-0 z-10 flex items-center justify-center py-8 sm:py-0 pointer-events-none">
           <div
@@ -197,18 +209,18 @@ function App() {
             <span>"LOCATION" SF</span>
             <span>"TIME" {currentTime}</span>
           </div>
-          <div className="w-full text-[34px] sm:text-[45px] tracking-[-0.05em] font-sans font-semibold ">
+          <div className="w-full text-[clamp(28px,7vw,45px)] tracking-[-0.05em] font-sans font-semibold">
             <span>justin guo </span> .  {' '}
             <span
               key={focusWords[focusIndex]}
-              className="focus-word text-[22px] sm:text-[38px] text-white tracking-[-0.01em]"
+              className="focus-word text-[clamp(18px,4.8vw,38px)] text-white tracking-[-0.01em]"
               style={{ fontFamily: "'Instrument Serif', serif" }}
             >
               {focusWords[focusIndex]}
             </span>
             
           </div>
-          <p className="leading-snug text-left text-[14px] sm:text-[15px] text-white tracking-[-0.015em]" style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>
+          <p className="leading-relaxed sm:leading-snug text-left text-[clamp(13px,3.6vw,15px)] text-white tracking-[-0.015em]" style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>
           <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(15px, 2.2vw, 17px)', fontWeight: 600 }}>
                &quot;To believe our own thought [...], that is genius.
                Man should learn to detect and watch that gleam of light which flashes across his mind from within.&quot;
@@ -245,8 +257,8 @@ i graduated from the university of michigan. i was also born & raised in michiga
             i enjoy meeting & being helpful to people. reach out & say what's up! 
           </p>
           <div className="w-full h-px bg-white/25" />
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-            <nav className="flex flex-row flex-wrap items-center gap-5 sm:gap-8">
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <nav className="flex flex-row flex-wrap items-center gap-4 sm:gap-8">
               {links.map((link) => (
                 <a
                   key={link.label}
