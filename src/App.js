@@ -176,9 +176,6 @@ function App() {
       <div className="fixed inset-0 pointer-events-none z-[1]" style={{ opacity: scrollProgress }}>
         <OceanShaderBackground />
       </div>
-      <svg className="cursor-trail-svg" aria-hidden="true">
-        <path d={trailPath} className="cursor-trail-line" />
-      </svg>
       <div
         className="cursor-light"
         style={{ left: cursorPos.x, top: cursorPos.y }}
