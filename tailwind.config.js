@@ -6,9 +6,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'instrument': ['Instrument Serif', 'serif'],
-        'satoshi': ['Satoshi', 'sans-serif'],
-        'garamond': ['EB Garamond', 'serif'],
+        instrument: ['Satoshi', 'sans-serif'],
+        satoshi: ['Satoshi', 'sans-serif'],
+        garamond: ['Satoshi', 'sans-serif'],
       },
       colors: {
         forest: {

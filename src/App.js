@@ -1,347 +1,304 @@
-import { useState, useEffect, useMemo } from 'react';
-import { CSSTransition, SwitchTransition } from 'react-transition-group';
-
-function MoneyRain() {
-  useEffect(() => {
-    const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '100%';
-    container.style.height = '100%';
-    container.style.pointerEvents = 'none';
-    container.style.zIndex = '50';
-    document.body.appendChild(container);
-
-    const createMoney = () => {
-      const money = document.createElement('div');
-      money.innerHTML = '💸';
-      money.className = 'money-particle text-2xl absolute';
-      money.style.left = Math.random() * 100 + 'vw';
-      money.style.animationDuration = Math.random() * 2 + 3 + 's';
-      container.appendChild(money);
-
-      setTimeout(() => {
-        if (container.contains(money)) {
-          money.style.transition = 'opacity 2s ease-out';
-          money.style.opacity = '0';
-          setTimeout(() => {
-            if (container.contains(money)) {
-              container.removeChild(money);
-            }
-          }, 2000);
-        }
-      }, 5000);
-    };
-
-    const interval = setInterval(createMoney, 100);
-    setTimeout(() => clearInterval(interval), 3000);
-
-    return () => {
-      clearInterval(interval);
-      container.style.transition = 'opacity 2s ease-out';
-      container.style.opacity = '0';
-      setTimeout(() => {
-        if (document.body.contains(container)) {
-          document.body.removeChild(container);
-        }
-      }, 2000);
-    };
-  }, []);
-
-  return null;
-}
-
-function Tooltip({ text, children }) {
-  const [isVisible, setIsVisible] = useState(false);
-
-  return (
-    <span className="relative inline-block">
-      <span
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-        onClick={() => setIsVisible(!isVisible)}
-        className="cursor-help underline decoration-dotted decoration-emerald-500 underline-offset-4 hover:text-emerald-400 transition-colors"
-      >
-        {children}
-      </span>
-      {isVisible && (
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[280px] sm:max-w-xs z-30">
-          <div className="bg-[#1a1a1a] border border-emerald-500/20 px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-xl">
-            <div className="text-xs sm:text-sm font-satoshi text-white/90 whitespace-normal">{text}</div>
-          </div>
-        </div>
-      )}
-    </span>
-  );
-}
-
-function SpotifyPopup({ isOpen, onClose }) {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-0">
-      <div className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg sm:text-xl text-white font-instrument">Habe - Sweet</h3>
-          <button 
-            onClick={onClose}
-            className="text-white/70 hover:text-white transition-colors p-2 -mr-2"
-          >
-            ✕
-          </button>
-        </div>
-        <iframe
-          title="Spotify: Habe - Sweet"
-          src="https://open.spotify.com/track/4sxWyjuwVqscK0YmfWrBvE?si=ee8707e3bff34072"
-          width="100%"
-          height="352"
-          frameBorder="0"
-          allowFullScreen=""
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-      </div>
-    </div>
-  );
-}
+import { useEffect, useMemo, useRef, useState } from 'react';
+import OceanShaderBackground from './components/OceanShaderBackground';
 
 function App() {
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [showMoneyRain, setShowMoneyRain] = useState(false);
-  const [isSpotifyOpen, setIsSpotifyOpen] = useState(false);
-  const phrases = useMemo(() => ["think different", "expand luck", "ask why", "find humor", "create $hareholder value", "just kidding lol"], []);
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [cursorTrail, setCursorTrail] = useState([]);
+  const [focusIndex, setFocusIndex] = useState(0);
+  const [isSteveHover, setIsSteveHover] = useState(false);
+  const [hoverProfile, setHoverProfile] = useState('steve');
+  const [closeOnNextMove, setCloseOnNextMove] = useState(false);
+  const isSteveHoverRef = useRef(false);
+  const closeOnNextMoveRef = useRef(false);
+  const steveHoverTimeoutRef = useRef(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() =>
+    new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })
+  );
+  const focusWords = ['focus', 'curiosity', 'wisdom', 'creativity', 'virtue', 'originality', 'play'];
+  const links = [
+    { label: 'Second Brain', href: 'https://docs.google.com/document/d/1XQnzkvK-oNL-zi9_mMNQMw4kfCiQAgowdDgp_PBVMOQ/edit?tab=t.0' },
+    { label: 'Substack', href: 'https://justinguo.substack.com/' },
+    { label: 'LinkedIn', href: 'https://linkedin.com/in/justinbguo' },
+    { label: 'Twitter', href: 'https://x.com/guo_dini' },
+    { label: 'Email', href: 'mailto:thejustinguo@gmail.com' },
+  ];
 
-  const experienceText = {
-    default: "i built YC's classic tarpit social app, managed my favorite music artist, and completed internships at large companies and seed-stage startups",
-    alternate: <>
-      i built <a href="https://apps.apple.com/us/app/push-for-quicker-hangouts/id6502925758" target="_blank" rel="noopener noreferrer" className="underline-offset-4 font-instrument italic font-semibold hover:text-emerald-400 text-emerald-500 transition-colors">Push (an IRL hangout app)</a>, managed{' '}
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          setIsSpotifyOpen(true);
-        }}
-        className="underline-offset-4 font-instrument italic font-semibold hover:text-yellow-300 text-yellow-400 transition-colors"
-      >
-        Habe
-      </button>, ran <a href="https://www.youtube.com/@microwavemane/videos" target="_blank" rel="noopener noreferrer" className="underline-offset-4 font-bold hover:text-red-400 text-red-500 transition-colors font-instrument italic">Microwave Mane</a>, and interned at{' '}
-      <a href="https://www.mastercard.us/en-us/business/issuers/business-payments.html" target="_blank" rel="noopener noreferrer" className="underline-offset-4 font-bold hover:text-orange-400 text-orange-500 transition-colors font-instrument italic">Mastercard (PM @ Commercial Solutions)</a>,{' '}
-      <a href="https://www.unileverfoodsolutions.us/" target="_blank" rel="noopener noreferrer" className="underline-offset-4 font-bold hover:text-blue-400 text-blue-500 transition-colors font-instrument italic">Unilever (Operations @ B2B Food Solutions)</a>, {' '}
-      <a href="https://www.linkedin.com/company/snackbreak-inc/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="underline-offset-4 font-bold hover:text-pink-400 text-pink-300 transition-colors font-instrument italic">Snack Break (PM @ Peek)</a>.
-    </>
+  const renderLinkIcon = (label) => {
+    switch (label) {
+      case 'Second Brain':
+        return (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6" y="3.75" width="13.5" height="16.5" rx="2.25" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 3.75v16.5M12 7.5h4.5M12 11.25h4.5M12 15h3.75M4.5 7.5h1.5M4.5 11.25h1.5M4.5 15h1.5" />
+          </svg>
+        );
+      case 'Substack':
+        return (
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z" />
+          </svg>
+        );
+      case 'LinkedIn':
+        return (
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" />
+          </svg>
+        );
+      case 'Twitter':
+        return (
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+        );
+      case 'Email':
+        return (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 19.5H5.25A2.25 2.25 0 013 17.25V6.75z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.5 7.5L12 13.5l8.5-6" />
+          </svg>
+        );
+      default:
+        return null;
+    }
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const nextIndex = (phraseIndex + 1) % phrases.length;
-      
-      if (phrases[nextIndex] === "create $hareholder value") {
-        setShowMoneyRain(true);
-        setTimeout(() => {
-          setPhraseIndex(nextIndex);
-        }, 500);
-      } else {
-        setPhraseIndex(nextIndex);
-        setShowMoneyRain(false);
+    isSteveHoverRef.current = isSteveHover;
+  }, [isSteveHover]);
+
+  useEffect(() => {
+    closeOnNextMoveRef.current = closeOnNextMove;
+  }, [closeOnNextMove]);
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      setCursorPos({ x: event.clientX, y: event.clientY });
+      setCursorTrail((prev) => [{ x: event.clientX, y: event.clientY }, ...prev].slice(0, 14));
+
+      if (isSteveHoverRef.current && closeOnNextMoveRef.current) {
+        setIsSteveHover(false);
+        setCloseOnNextMove(false);
+        isSteveHoverRef.current = false;
+        closeOnNextMoveRef.current = false;
       }
-    }, phrases[phraseIndex] === "create $hareholder value" ? 3000 : 1000);
+    };
 
-    return () => clearInterval(interval);
-  }, [phraseIndex, phrases]);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-  const handleMouseEnter = () => setIsFlipped(true);
-  const handleMouseLeave = () => setIsFlipped(false);
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setFocusIndex((prev) => (prev + 1) % focusWords.length);
+    }, 2500);
+
+    return () => window.clearInterval(interval);
+  }, [focusWords.length]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const maxTransitionDistance = window.innerHeight * 0.9;
+      const progress = Math.min(window.scrollY / maxTransitionDistance, 1);
+      setScrollProgress(progress);
+    };
+
+    updateProgress();
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    return () => {
+      window.removeEventListener('scroll', updateProgress);
+      window.removeEventListener('resize', updateProgress);
+    };
+  }, []);
+
+  const trailPath = useMemo(() => {
+    if (cursorTrail.length < 2) return '';
+
+    const [first, ...rest] = cursorTrail;
+    let path = `M ${first.x} ${first.y}`;
+
+    for (let i = 1; i < cursorTrail.length; i++) {
+      const prev = cursorTrail[i - 1];
+      const curr = cursorTrail[i];
+      const midX = (prev.x + curr.x) / 2;
+      const midY = (prev.y + curr.y) / 2;
+      path += ` S ${prev.x} ${prev.y}, ${midX} ${midY}`;
+    }
+
+    const last = rest[rest.length - 1];
+    path += ` L ${last.x} ${last.y}`;
+    return path;
+  }, [cursorTrail]);
+
+  const handleProfileHoverTrigger = (profile) => {
+    if (isSteveHoverRef.current || steveHoverTimeoutRef.current) return;
+    steveHoverTimeoutRef.current = window.setTimeout(() => {
+      steveHoverTimeoutRef.current = null;
+      setHoverProfile(profile);
+      setIsSteveHover(true);
+      setCloseOnNextMove(false);
+      isSteveHoverRef.current = true;
+      closeOnNextMoveRef.current = false;
+
+      window.setTimeout(() => {
+        setCloseOnNextMove(true);
+        closeOnNextMoveRef.current = true;
+      }, 120);
+    }, 1000);
+  };
+
+  const handleSteveHoverCancel = () => {
+    if (!steveHoverTimeoutRef.current) return;
+    window.clearTimeout(steveHoverTimeoutRef.current);
+    steveHoverTimeoutRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (steveHoverTimeoutRef.current) {
+        window.clearTimeout(steveHoverTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-forest-gradient flex items-center overflow-hidden">
-      {showMoneyRain && <MoneyRain />}
-      <SpotifyPopup 
-        isOpen={isSpotifyOpen} 
-        onClose={() => setIsSpotifyOpen(false)} 
+    <>
+      <div className="fixed inset-0 pointer-events-none z-0 bg-forest-gradient" />
+      <div className="fixed inset-0 pointer-events-none z-[1]" style={{ opacity: scrollProgress }}>
+        <OceanShaderBackground />
+      </div>
+      <svg className="cursor-trail-svg" aria-hidden="true">
+        <path d={trailPath} className="cursor-trail-line" />
+      </svg>
+      <div
+        className="cursor-light"
+        style={{ left: cursorPos.x, top: cursorPos.y }}
+        aria-hidden="true"
       />
-      <main className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 sm:py-0">
-        {/* Header Section */}
-        <div className="mb-8 sm:mb-16">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0 mb-3">
-            <h1 className="text-3xl sm:text-4xl text-white font-instrument tracking-tight underline decoration-emerald-500 underline-offset-4" style={{ textDecorationThickness: '3px' }}>
-              justin guo
-            </h1>
-            <span className="hidden sm:inline text-white text-2xl">•</span>
-            <span className="text-3xl sm:text-4xl font-instrument p-2 bg-gradient-to-r from-emerald-300 via-emerald-500 via-green-600 to-teal-300 text-transparent bg-clip-text transition-transform duration-500 ease-in-out transform hover:scale-110">
-              {phrases[phraseIndex]}
+      <div className="cursor-dot" style={{ left: cursorPos.x, top: cursorPos.y }} />
+      <div>
+        <div className="fixed inset-0 z-10 flex items-center justify-center py-8 sm:py-0 pointer-events-none">
+          <div
+            className={`page-load-blur pointer-events-auto max-w-[92vw] h-auto sm:h-[60vh] px-5 sm:px-12 text-white transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSteveHover ? 'w-[980px]' : 'w-[640px]'}`}
+            style={{ fontFamily: "'Bookish', 'Helvetica Neue', Arial, sans-serif" }}
+          >
+          <div className="flex h-full w-full items-stretch">
+          <div className={`min-w-0 flex flex-col justify-center gap-2 sm:gap-3 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSteveHover ? 'w-[58%] pr-6' : 'w-full'}`}>
+          <div
+            className="-mb-1 flex items-center justify-between text-[18px] sm:text-[20px] text-white/85"
+            style={{ fontFamily: "'Instrument Serif', serif", fontWeight: 600 }}
+          >
+            <span>"LOCATION" SF</span>
+            <span>"TIME" {currentTime}</span>
+          </div>
+          <div className="w-full text-[34px] sm:text-[45px] tracking-[-0.05em] font-sans font-semibold ">
+            <span>justin guo </span> .  {' '}
+            <span
+              key={focusWords[focusIndex]}
+              className="focus-word text-[22px] sm:text-[38px] text-white tracking-[-0.01em]"
+              style={{ fontFamily: "'Instrument Serif', serif" }}
+            >
+              {focusWords[focusIndex]}
+            </span>
+            
+          </div>
+          <p className="leading-snug text-left text-[14px] sm:text-[15px] text-white tracking-[-0.015em]" style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>
+          <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(15px, 2.2vw, 17px)', fontWeight: 600 }}>
+               &quot;To believe our own thought [...], that is genius.
+               Man should learn to detect and watch that gleam of light which flashes across his mind from within.&quot;
+               <br />
+
+             </span>        
+            <br />
+            <span
+              className="block mb-0 text-[18px] sm:text-[20px] font-bold"
+              style={{ fontFamily: "'Instrument Serif', serif" }}
+            >
+WORK . 
+            </span>
+            <span className="block h-px w-full bg-white/80 mb-1" />
+             i work on growing whatnot (one of the fastest-growing marketplaces in history)
+             pioneering the future of live-shopping in the United States. my jewelry & watch sellers make <span>millions of $$$ / year</span> through livestreaming. it's insane.
+             <br /><br />
+in the past few years, i shipped a consumer  app with <span>5+ figure ARR (top 150 on the app store)</span>,
+wrote essays that hundreds of thousands of people have read<span></span>, and created videos that have <span>tens of millions of views</span> across multiple platforms.
+             <br /><br />
+             i spike in <span>executing and expressing ideas</span> in precise ways, whether that be through software, writing, or video.
+             <br /><br />
+             <span
+               className="block mb-0 text-[18px] sm:text-[20px] font-bold"
+               style={{ fontFamily: "'Instrument Serif', serif" }}
+             >
+               PERSONAL  .
+             </span>
+             <span className="block h-px w-full bg-white/80 mb-1" />
+             personally, i play soccer, run, and read. i like to watch one random lecture a week to see what it can teach me. i look up to free-spirited people like <span onMouseEnter={() => handleProfileHoverTrigger('steve')} onMouseLeave={handleSteveHoverCancel}>steve jobs</span>, <span onMouseEnter={() => handleProfileHoverTrigger('virgil')} onMouseLeave={handleSteveHoverCancel}>virgil abloh</span>, and <span onMouseEnter={() => handleProfileHoverTrigger('ronaldinho')} onMouseLeave={handleSteveHoverCancel}>ronaldinho</span>. my other interests include spirituality, philosophy, and health.
+             <br /><br />
+i graduated from the university of michigan. i was also born & raised in michigan. <span>i now live in san francisco, where i'm accentuating my fascination with consumer-focused technology</span>.
+            <br /><br />
+            i enjoy meeting & being helpful to people. reach out & say what's up! 
+          </p>
+          <div className="w-full h-px bg-white/25" />
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+            <nav className="flex flex-row flex-wrap items-center gap-5 sm:gap-8">
+              {links.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={link.href.startsWith('mailto:') ? undefined : '_blank'}
+                  rel={link.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                  className="inline-flex items-center justify-center text-white"
+                  style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
+                  aria-label={link.label}
+                  title={link.label}
+                >
+                  {renderLinkIcon(link.label)}
+                </a>
+              ))}
+            </nav>
+            <span className="text-white/80 text-[12px] sm:text-[13px]" style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>
+              (Last updated, Feb 28, 2026)
             </span>
           </div>
-
-          {/* Bio Section */}
-          <div className="text-white leading-relaxed font-satoshi space-y-3 max-w-xl mb-2">
-            <p className="text-md font-bold">
-              i want to create magical experiences that make people smile. 
-            </p>
-            <p className="text-sm sm:text-md font-thin">
-              however, i'm not a magician nor a dentist. 
-            </p>
-            <p className="text-lg sm:text-xl font-instrument italic underline underline-offset-4">
-              I ship products that solve problems. 
-            </p>
-            <p className="text-sm sm:text-md font-thin">
-            I work on growing <a href="https://whatnot.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">Whatnot</a> (the fastest-growing marketplace in the US) pioneering the future of live-shopping in the US. 
-              Before that, I graduated from the <a href="https://umich.edu" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#FFCB05] underline font-instrument font-semibold">University of Michigan</a>, 
-              where I explored my interests in product management, startups, and finance. 
-            </p>
-            <div 
-              className="flex items-center group relative"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-            >
-              <p className="text-md font-thin">
-                <SwitchTransition mode="out-in">
-                  <CSSTransition
-                    key={isFlipped}
-                    timeout={300}
-                    classNames="fade"
-                    unmountOnExit
-                  >
-                    <span>
-                      {isFlipped ? (
-                        <span className="underline-offset-4">
-                          {experienceText.alternate}
-                          <span className="text-emerald-500 hover:text-emerald-400 bg-white/5 hover:bg-white/10 transition-all duration-300 text-md font-satoshi ml-2 inline-flex items-center justify-center h-7 w-7 spin-button rounded-full">
-                            ↻
-                          </span>
-                        </span>
-                      ) : (
-                        <>
-                          i built <span className="font-instrument italic font-semibold">YC's classic tarpit social app</span>,{' '}
-                          managed my favorite <span className="font-instrument italic font-semibold">indie music artist</span>, 
-                          ran a <span className="font-instrument italic font-semibold">TikTok compilation YouTube channel</span>,
-                          
-                          and completed{' '}
-                          <span className="font-instrument italic font-bold">3 internships</span> at Fortune 200 companies and seed-stage startups.
-                          <span className=" items-center justify-center text-emerald-500 hover:text-emerald-400 bg-white/5 hover:bg-white/10 transition-all duration-300 text-md font-satoshi ml-2 inline-flex items-center justify-center h-7 w-7 spin-button rounded-full">
-                            ↻
-                          </span>
-                        </>
-                      )}
-                    </span>
-                  </CSSTransition>
-                </SwitchTransition>
-              </p>
-            </div>
-            <p className="text-md font-thin  underline-offset-4">
-              these experiences have built a <span className="font-semibold italic">versatile skillset</span> in product, design, engineering, and distribution while building a <span className="">sharp, entrepreneurial character</span>. 
-            </p>
-            <p className="text-md font-thin">
-              personally, i'm a{' '}
-              <Tooltip text="CAM/RW/LW, Arsenal Fan, Life peaked when a goal I scored in HS was posted to a page with 1.7M+ followers.">
-                soccer player
-              </Tooltip>
-              ,{' '}
-              <Tooltip text="Currently enjoying This Past Weekend (Theo Von), Modern Wisdom, HIBT, Lenny's Podcast, Andrew Huberman, a16z, and more.">
-                podcast listener
-              </Tooltip>
-              ,{' '}
-              <Tooltip text="Favorite books:
-• Steve Jobs
-• The Cold Start Problem
-• Hatching Twitter
-• The Autobiography of Gucci Mane
-• Elon Musk 
-• Moonwalking with Einstein
-• Leading
-• The Case Against Reality
-• Hidden Genius
-• Atomic Habits
-• Can't Hurt Me"
-
->
-                reader
-              </Tooltip>
-              , and{' '}
-              <Tooltip text="This is just a fancy way of saying I try to trade public equities based off of information that institutions typically would not consider (ex: TikTok trends).
-              Won a trading contest out of 220 participants in my finance class with a 55% 1 month return.">
-                social arbitrage investor
-              </Tooltip>
-              .
-            </p>
-            <p className="text-md font-thin">
-              i love meeting new people and finding new opportunities- <span className="font-bold underline decoration-emerald-500 underline-offset-4">jbguo@umich.edu</span>. 
-            </p>
           </div>
-
-          {/* Divider */}
-          <div className="w-full h-px bg-white/20 my-4"></div>
-
-          {/* Footer */}
-          <footer className="w-full">
-            <div className="grid grid-cols-3 sm:flex sm:space-x-12 gap-4 sm:gap-0 justify-center sm:justify-start">
-              <a 
-                href="https://docs.google.com/document/d/1XQnzkvK-oNL-zi9_mMNQMw4kfCiQAgowdDgp_PBVMOQ/edit?usp=sharing" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
-                title="Interests"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 1c-4.4 0-8 3.6-8 8 0 2.6 1.2 4.9 3.1 6.3-.4 1.3-1 2.5-2 3.5-.2.2-.2.5-.1.7.1.2.3.3.5.3 2.2-.1 4-1 5.3-2.2.4.1.8.1 1.2.1 4.4 0 8-3.6 8-8s-3.6-8-8-8zm0 14.5c-.5 0-1-.1-1.5-.2-.2-.1-.4 0-.6.1-1 .9-2.2 1.5-3.5 1.8.7-1 1.2-2.1 1.5-3.3.1-.3 0-.6-.3-.8C6.1 12.3 5 10.7 5 9c0-3.9 3.1-7 7-7s7 3.1 7 7-3.1 7-7 7z"/>
-                  <path d="M14.5 6.5c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5S16 8.8 16 8s-.7-1.5-1.5-1.5zm-5 0C8.7 6.5 8 7.2 8 8s.7 1.5 1.5 1.5S11 8.8 11 8s-.7-1.5-1.5-1.5zm5.5 4h-5c-.3 0-.5.2-.5.5s.2.5.5.5h5c.3 0 .5-.2.5-.5s-.2-.5-.5-.5z"/>
-                </svg>
-                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Interests</span>
-              </a>
-              <a 
-                href="https://linkedin.com/in/justinbguo" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
-                title="LinkedIn"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z"></path>
-                </svg>
-                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">LinkedIn</span>
-              </a>
-              <a 
-                href="https://x.com/guo_dini" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
-                title="Twitter"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
-                </svg>
-                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Twitter</span>
-              </a>
-              <a 
-                href="https://justinguo.substack.com/"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
-                title="Writing"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
-                </svg>
-                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Writing</span>
-              </a>
-              <a 
-                href="https://docs.google.com/document/d/10l9hb2p25nOWMVBlgW55dBj3zzCRoMMdvr5U5-LTa5o/edit?tab=t.0"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white transition-all duration-300 flex items-center space-x-2"
-                title="Resume"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.25 2.5h-9a1.5 1.5 0 00-1.5 1.5v16a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V7.25L14.25 2.5zm0 1.5L18.75 8h-4.5V4zm-9 15.5V4h7.5v4.5a1.5 1.5 0 001.5 1.5h4.5v10h-13.5zm3-8.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zm0 3a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zm0 3a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75z"/>
-                </svg>
-                <span className="hidden sm:inline font-satoshi text-sm sm:text-base">Resume</span>
-              </a>
-            </div>
-          </footer>
+          <div
+            className={`hidden sm:block overflow-hidden rounded-xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSteveHover ? 'w-[42%] opacity-100' : 'w-0 opacity-0'}`}
+          >
+            <img
+              src={
+                hoverProfile === 'virgil'
+                  ? '/virgil-abloh.png'
+                  : hoverProfile === 'ronaldinho'
+                    ? '/ronaldinho.png'
+                    : '/steve-jobs-time-cover.png'
+              }
+              alt={
+                hoverProfile === 'virgil'
+                  ? 'Virgil Abloh'
+                  : hoverProfile === 'ronaldinho'
+                    ? 'Ronaldinho'
+                    : 'Steve Jobs TIME cover'
+              }
+              className="h-full w-full object-contain bg-black/20 grayscale"
+            />
+          </div>
+          </div>
+          </div>
         </div>
-      </main>
-    </div>
+        <div className="h-[190vh]" aria-hidden="true" />
+      </div>
+    </>
   );
 }
 
 export default App;
+

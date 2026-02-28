@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bookish&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@1,900,700,500,301,701,300,501,401,901,400,2&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,16 +11,19 @@
   --forest-deep: #051510;
   --forest-mid: #0B291E;
   --forest-light: #0F3C2D;
+  --forest-solid: #0B291E;
 }
 
 .bg-forest-gradient {
-  background-image: radial-gradient(circle at 50% 50%, var(--forest-light) 0%, var(--forest-mid) 35%, var(--forest-deep) 100%);
+  background-color: var(--forest-solid);
+  background-image: none;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  background-color: var(--forest-solid);
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -79,4 +83,150 @@ code {
   z-index: 50;
   pointer-events: none;
   opacity: 1;
+}
+
+html,
+body,
+#root,
+* {
+  cursor: none !important;
+}
+
+.cursor-dot {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #ffffff;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-light {
+  position: fixed;
+  width: 88px;
+  height: 88px;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.055) 35%,
+    rgba(255, 255, 255, 0.015) 60%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  mix-blend-mode: screen;
+  filter: blur(5px);
+}
+
+.cursor-trail-svg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.cursor-trail-line {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: blur(0.2px);
+}
+
+.cursor-trail-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: #ffffff;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+@keyframes focusWordFade {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.focus-word {
+  display: inline-block;
+  animation: focusWordFade 900ms ease-in-out;
+}
+
+@keyframes pageLoadBlurIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.page-load-blur {
+  animation: pageLoadBlurIn 800ms ease-out both;
+}
+
+::selection {
+  background: rgba(209, 213, 219, 0.35);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(209, 213, 219, 0.35);
+  color: #ffffff;
+}
+
+.underline,
+u {
+  text-underline-offset: 3px;
+}
+
+@keyframes glassTextShift {
+  0% {
+    background-position: 0% 50%;
+    filter: saturate(1) brightness(1);
+  }
+  50% {
+    background-position: 60% 40%;
+    filter: saturate(1.08) brightness(1.03);
+  }
+  100% {
+    background-position: 100% 50%;
+    filter: saturate(1) brightness(1);
+  }
+}
+
+.shader-body-text {
+  background-image:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.88) 0%,
+      rgba(211, 223, 236, 0.95) 35%,
+      rgba(236, 241, 247, 0.92) 65%,
+      rgba(255, 255, 255, 0.86) 100%
+    );
+  background-size: 180% 180%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow:
+    0 0 10px rgba(230, 238, 247, 0.18),
+    0 0 24px rgba(180, 198, 216, 0.12);
+  animation: glassTextShift 8s ease-in-out infinite;
 }
