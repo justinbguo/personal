@@ -195,9 +195,9 @@ function App() {
         </>
       )}
       <div>
-        <div className="fixed inset-0 z-10 flex items-center justify-center py-8 sm:py-0 pointer-events-none">
+        <div className="relative z-10 px-4 py-6 pointer-events-none sm:fixed sm:inset-0 sm:flex sm:items-center sm:justify-center sm:py-8">
           <div
-            className={`page-load-blur pointer-events-auto max-w-[92vw] h-auto sm:h-[60vh] px-5 sm:px-12 text-white transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSteveHover ? 'w-[980px]' : 'w-[640px]'}`}
+            className={`page-load-blur pointer-events-auto w-full max-w-[720px] sm:max-w-[92vw] h-auto sm:h-[60vh] px-5 sm:px-12 text-white transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isSteveHover ? 'sm:w-[980px]' : 'sm:w-[640px]'}`}
             style={{ fontFamily: "'Bookish', 'Helvetica Neue', Arial, sans-serif" }}
           >
           <div className="flex h-full w-full items-stretch">
@@ -303,7 +303,7 @@ i graduated from the university of michigan. i was also born & raised in michiga
           </div>
           </div>
         </div>
-        <div className="h-[190vh]" aria-hidden="true" />
+        <div className="hidden h-[190vh] sm:block" aria-hidden="true" />
       </div>
     </>
   );
