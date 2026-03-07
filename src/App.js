@@ -20,7 +20,7 @@ function App() {
     { label: 'Second Brain', href: 'https://docs.google.com/document/d/1XQnzkvK-oNL-zi9_mMNQMw4kfCiQAgowdDgp_PBVMOQ/edit?tab=t.0' },
     { label: 'Substack', href: 'https://justinguo.substack.com/' },
     { label: 'LinkedIn', href: 'https://linkedin.com/in/justinbguo' },
-    { label: 'Twitter', href: 'https://x.com/guo_dini' },
+    { label: 'Twitter', href: 'https://x.com/thejustinguo' },
     { label: 'Email', href: 'mailto:thejustinguo@gmail.com' },
   ];
   const iconClassName = 'h-4 w-4 sm:h-5 sm:w-5';

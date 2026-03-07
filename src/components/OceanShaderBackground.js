@@ -24,8 +24,8 @@ const float SEA_HEIGHT = 0.6;
 const float SEA_CHOPPY = 4.0;
 const float SEA_SPEED = 0.8;
 const float SEA_FREQ = 0.16;
-const vec3 SEA_BASE = vec3(0.0, 0.05, 0.11);
-const vec3 SEA_WATER_COLOR = vec3(0.45, 0.6, 0.5) * 0.35;
+const vec3 SEA_BASE = vec3(0.03, 0.03, 0.03);
+const vec3 SEA_WATER_COLOR = vec3(0.18, 0.18, 0.18) * 0.28;
 #define SEA_TIME (1.0 + iTime * SEA_SPEED)
 #define EPSILON_NRM (0.1 / iResolution.x)
 const mat2 octave_m = mat2(1.6, 1.2, -1.2, 1.6);
@@ -203,7 +203,9 @@ vec3 getPixel(vec2 coord, float time) {
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   float time = iTime * 0.3 + iMouse.x * 0.01;
   vec3 color = getPixel(fragCoord, time);
-  fragColor = vec4(pow(color, vec3(0.65)), 1.0);
+  float monochrome = dot(color, vec3(0.299, 0.587, 0.114));
+  vec3 darkMono = vec3(monochrome) * 0.58;
+  fragColor = vec4(pow(darkMono, vec3(0.65)), 1.0);
 }
 
 void main() {
