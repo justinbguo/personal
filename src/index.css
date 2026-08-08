@@ -12,11 +12,44 @@
   --forest-mid: #0B291E;
   --forest-light: #0F3C2D;
   --forest-solid: #0B291E;
+  --bio-paragraph-gap: 0.65rem;
 }
 
 .bg-forest-gradient {
-  background-color: var(--forest-solid);
-  background-image: none;
+  background-color: var(--forest-deep);
+  background-image: radial-gradient(
+    ellipse 130% 90% at 50% 42%,
+    rgba(20, 68, 52, 0.55) 0%,
+    var(--forest-mid) 42%,
+    var(--forest-deep) 100%
+  );
+}
+
+.bio-p-gap {
+  display: block;
+  height: var(--bio-paragraph-gap);
+}
+
+blockquote.bio-quote {
+  margin-bottom: var(--bio-paragraph-gap);
+}
+
+.social-link {
+  opacity: 0.7;
+  transition: opacity 150ms ease;
+}
+
+.social-link:hover {
+  opacity: 1;
+}
+
+.social-magnet-inner {
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) scale(1);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.social-link:hover .social-magnet-inner {
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) scale(1.08);
 }
 
 body {
